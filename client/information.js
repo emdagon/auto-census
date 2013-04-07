@@ -1,6 +1,8 @@
 
 Information = new Meteor.Collection("information");
 
+Meteor.subscribe("information");
+
 Session.set('person_id', null);
 
 Template.info.person = function() {

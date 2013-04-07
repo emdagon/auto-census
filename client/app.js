@@ -12,7 +12,7 @@ Template.publish.events({
         filepicker.pick({
                 mimetypes: ['image/*', 'text/plain'],
                 container: 'window',
-                services:['COMPUTER'],
+                services: ['COMPUTER', 'FACEBOOK', 'FLICKR', 'WEBCAM']
             },
             function(FPFile) {
                 $("#picture").val(FPFile.url);
@@ -21,7 +21,7 @@ Template.publish.events({
             function(FPError) {
                 $("#picture").val("");
                 $("#picture-preview").attr("src", "/images/missing.jpg");
-                alert(FPError.toString());
+                alert("No ha seleccionado una foto!");
             }
         );
     },
@@ -34,6 +34,8 @@ Template.publish.events({
                 picture: $("#picture").val(),
                 relationship: $("#relationship").val(),
                 status: $("#status").val(),
+                age: $("#age").val(),
+                genre: $("input[name=genre]:checked").val(),
                 messages: 0,
                 complaints: 0
             });

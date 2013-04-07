@@ -155,10 +155,12 @@
                     <h3>{{name}}</h3>
                     <p>{{description}}</p>
                     <p>Se presume {{status}}</p>
+                    {{#if currentUser}}
                     <p>
                         <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
                         <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
                     </p>
+                    {{/if}}
                 </div>
             </div>
         </li>
@@ -252,11 +254,13 @@
             <input type="hidden" id="complaint" value="{{is_complaint}}" />
         </div>
         <div class="modal-footer">
-            <textarea id="message" class="pull-left" style="width: 440px;" rows="2" placeholder="Escriba aqu&iacute;..."></textarea>
-            {{#if is_complaint}}
-                <button class="btn btn-danger send">Enviar</button>
-            {{else}}
-                <button class="btn btn-primary btn-warning send">Enviar</button>
+            {{#if currentUser}}
+                <textarea id="message" class="pull-left" style="width: 440px;" rows="2" placeholder="Escriba aqu&iacute;..."></textarea>
+                {{#if is_complaint}}
+                    <button class="btn btn-danger send">Enviar</button>
+                {{else}}
+                    <button class="btn btn-primary btn-warning send">Enviar</button>
+                {{/if}}
             {{/if}}
         </div>
     </div>
