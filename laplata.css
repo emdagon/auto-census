@@ -1,0 +1,11 @@
+/* CSS declarations go here */
+.form-horizontal input + .help-block,
+.form-horizontal select + .help-block,
+.form-horizontal textarea + .help-block,
+.form-horizontal .uneditable-input + .help-block,
+.form-horizontal .input-prepend + .help-block,
+.form-horizontal .input-append + .help-block {
+    margin-top: 0px;
+    font-size: 12px;
+    color: lightgray;
+}

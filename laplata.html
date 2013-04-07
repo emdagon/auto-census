@@ -1,0 +1,263 @@
+<head>
+    <title>laplata</title>
+</head>
+
+<body>
+    <div class="container">
+
+        {{> header}}
+
+        {{> publish}}
+        {{> info}}
+
+        {{> list}}
+
+    </div>
+
+</body>
+
+<template name="header">
+    <h1 class="text-center">Inundaci&oacute;n de La Plata</h1>
+    <h2 class="text-center">Listado colaborativo de afectados</h2>
+
+    <div class="alert alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong>Nota del autor:</strong>
+
+        <p>Esta aplicaci&oacute;n fue creada como respuesta inmediata a la insertidumbre respecto de las personas afectadas por la inundaci&oacute;n de la ciudad de La Plata. Su &uacute;nico prop&oacute;sito es servir a las personas para encontrar a sus seres queridos, intentando que la informaci&oacute;n fidedigna prevalezca sobre los dichos y datos incorrectos.</p>
+        <p>Por favor, utilicelo con responsabilidad.</p>
+        <p>Este sitio es totalmente independiente, desarrollado y financiado por m&iacute; sin m&aacute;s intenci&oacute;n que ayudar. No me hago responsable por la veracidad de informaci&oacute;n aqu&iacute; dispuesta, ni por como pueda afectar a la sensibilidad de las personas.</p>
+        <p>Sepa disculpar los errores con los que se encuentre, el desarrollo se hizo en unas pocas horas, no dude en contactarme por cualquier inquietud.</p>
+        <p>Mi coraz&oacute;n esta con las personas que estan atravezando por tanto dolor.</p>
+        <p>Fuerza La Plata!</p>
+        <p>Emilio | <i class="icon-pencil"></i> emdagon{at}gmail.com</p>
+    </div>
+
+    {{#if currentUser}}
+        <p>Hola <strong>{{currentUser.profile.name}}</strong>, por favor, antes de publicar no olvide buscar el nombre de la persona sobre la que desea o tiene informaci&oacute;n. <a href="#" class="btn btn-mini" id="logout">Salir</a></p>
+    {{else}}
+        <div class="alert alert-error">
+            <p><strong>A modo de respaldo, si desea publicar informaci&oacute;n es necesario que se identifique utilizando su cuenta de Facebook</strong></p>
+        </div>
+    {{/if}}
+</template>
+
+<template name="publish">
+
+    <div id="publish-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="Ingresar persona" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4>Ingrese el nombre y una descripci&oacute;n de la persona</h4>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal">
+
+                <div class="control-group">
+                    <label class="control-label" for="name">Nombre</label>
+                    <div class="controls">
+                        <input type="text" name="name" id="name" placeholder="Nombre completo de la persona" />
+                        <span class="help-block">Ejemplo: <em>Emilio Daniel Gonz&aacute;lez</em></span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="name">Edad y Sexo</label>
+                    <div class="controls">
+                        <input type="text" class="input-mini" name="age" id="age" />
+                        <span class="help-block">Ejemplo: <em>30</em></span>
+                        <label class="radio">
+                            <input type="radio" name="genre" id="male" value="male" checked>
+                            Hombre
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="genre" id="female" value="female">
+                            Mujer
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="description">Descripci&oacute;n</label>
+                    <div class="controls">
+                        <input type="text" name="description" id="description" placeholder="Edad, descripci&oacute;n fisica, etc.">
+                        <span class="help-block">Ejemplo: <em>1.80, rubio, con barba. Usaba remera negra y jeans</em>.</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="filepicker">Foto</label>
+                    <div class="controls">
+                        <input type="hidden" name="picture" id="picture" value="" />
+                        <img src="/images/missing.jpg" id="picture-preview" class="img-polaroid" style="width: 120px;" /><br />
+                        <a href="#" class="btn btn-small" id="filepicker">Adjuntar</a>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="control-group">
+                    <label class="control-label" for="relationship">Relaci&oacute;n</label>
+                    <div class="controls">
+                        <select name="relationship" id="relationship">
+                            <option>Familiar</option>
+                            <option>Vecino(a)</option>
+                            <option>Amigo(a)/Conocido(a)</option>
+                            <option>Desconocido(a)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="status">Estado</label>
+                    <div class="controls">
+                        <select name="status" id="status">
+                            <option>Desaparecido(a)</option>
+                            <option>Fallecido(a)</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" data-dismiss="modal" class="btn">Cancelar</a>
+            <a href="#" class="btn btn-primary" id="save">Publicar</a>
+        </div>
+    </div>
+</template>
+
+<template name="list">
+    <div class="row">
+        <div class="span4">
+            {{#if currentUser}}
+                <a href="#publish-modal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Ingresar Persona</a>
+            {{else}}
+                {{loginButtons}}
+            {{/if}}
+        </div>
+        <div class="span3 offset5">
+            <div class="input-append pull-right">
+                <input class="span2" id="search-input" type="text" placeholder="Nombre" />
+                <button class="btn" id="search-button" type="button">Buscar</button>
+            </div>
+        </div>
+    </div>
+    <ul class="thumbnails">
+        {{#each people}}
+        <li class="span3">
+            <div class="thumbnail">
+                <span class="badge badge-info pull-right">{{messages}}</span>
+                {{#if picture}}
+                    <img src="{{picture}}" class="polaroid" style="height: 200px;" />
+                {{else}}
+                    <img src="/images/missing.jpg" class="polaroid" style="height: 200px;" />
+                {{/if}}
+                <div class="caption">
+                    <h3>{{name}}</h3>
+                    <p>{{description}}</p>
+                    <p>Se presume {{status}}</p>
+                    <p>
+                        <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
+                        <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
+                    </p>
+                </div>
+            </div>
+        </li>
+        {{/each}}
+    </ul>
+</template>
+
+<!-- template name="table-list">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Descripci&oacute;n</th>
+                <th>&Uacute;ltima novedad</th>
+                <th>Acciones </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each people}}
+            <tr>
+                <td>
+                    {{#if picture}}
+                        <img src="{{picture}}" style="width: 40px;" />
+                    {{else}}
+                        <img src="/images/missing.jpg" style="width: 40px;" />
+                    {{/if}}
+                </td>
+                <td>{{name}}</td>
+                <td>{{description}}</td>
+                <td>{{status}}</td>
+                <td>
+                    <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
+                    <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
+                    <span class="badge badge-info">({{messages}} Mensajes)</span>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</template-->
+
+<template name="info">
+    <div id="info-modal" class="modal hide fade" tabindex="-1" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            {{#if is_complaint}}
+                <h4 class="text-error">Reportar informaci&oacute;n falsa o err&oacute;nea</h4>
+            {{else}}
+                <h4>Aportar informaci&oacute;n</h4>
+            {{/if}}
+            <div class="row">
+                <div class="span1">
+                    {{#if person.picture}}
+                    <img class="img-polaroid" src="{{person.picture}}" style="width: 60px;" />
+                    {{else}}
+                    <img class="img-polaroid" src="/images/missing.jpg" style="width: 60px;" />
+                    {{/if}}
+                </div>
+                <div class="offset1">
+                    <address>
+                        <strong>{{person.name}}</strong><br />
+                        {{person.description}}.<br />
+                        Se presume <em>{{person.status}}</em>.
+                    </address>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body" id="information-log">
+            <dl class="dl-horizontal">
+                {{#each information}}
+                    <dt>
+                        <a href="{{author.url}}" target="_blank">{{author.name}}</a>
+                    </dt>
+                    <dd>
+                        <blockquote>
+                            <p>
+                                {{#if complaint}}
+                                    <span class="label label-important"><i class="icon-bullhorn"></i></span>
+                                {{/if}}
+                                {{message}}
+                            </p>
+                            <small>{{created}}</small>
+                        </blockquote>
+                    </dd>
+                {{else}}
+                    <p class="text-info">A&uacute;n no hay informaci&oacute;n sobre &eacute;sta persona.</p>
+                {{/each}}
+            </dl>
+            <input type="hidden" id="person_id" value="{{person._id}}" />
+            <input type="hidden" id="complaint" value="{{is_complaint}}" />
+        </div>
+        <div class="modal-footer">
+            <textarea id="message" class="pull-left" style="width: 440px;" rows="2" placeholder="Escriba aqu&iacute;..."></textarea>
+            {{#if is_complaint}}
+                <button class="btn btn-danger send">Enviar</button>
+            {{else}}
+                <button class="btn btn-primary btn-warning send">Enviar</button>
+            {{/if}}
+        </div>
+    </div>
+</template>
