@@ -155,13 +155,13 @@
                     <h3>{{name}}</h3>
                     <p>{{description}}</p>
                     <p>Se presume {{status}}</p>
-                    {{#if currentUser}}
+                </div>
+                {{#if currentUser}}
                     <p>
                         <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
                         <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
                     </p>
-                    {{/if}}
-                </div>
+                {{/if}}
             </div>
         </li>
         {{/each}}
