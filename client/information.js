@@ -47,24 +47,19 @@ Template.info.rendered = function() {
     il.animate({scrollTop: il.children().height()}, 700);
 };
 
-// hack! to avoid the reactiveness in the person attribute, I create another (reactive) cursor for use with the Router
-var loadPerson = function() {
-    var person = People.findOne({_id: Session.get('person_id')});
-    return person;
-};
-
 Meteor.Router.add({
-    "/add-information/:id": function(person_id) {
+    "/view-information/:id": function(person_id) {
         Session.set('person_id', person_id);
         Session.set('message_type', "notice");
-        if (loadPerson()) {
+        // hack! to avoid the reactiveness in the person attribute, I create another (reactive) cursor for use with the Router
+        if (loadPerson(person_id)) {
             $("#info-modal").modal("show");
         }
     },
     "/add-complaint/:id": function(person_id) {
         Session.set('person_id', person_id);
         Session.set('message_type', "complaint");
-        if (loadPerson()) {
+        if (loadPerson(person_id)) {
             $("#info-modal").modal("show");
         }
     }
@@ -73,5 +68,6 @@ Meteor.Router.add({
 if (Meteor.isClient) {
     Meteor.startup(function () {
         $("#info-modal").on("shown", Template.info.rendered);
+        $("#info-modal").on("hide", function() { Meteor.Router.to("/") });
     });
 }

@@ -11,7 +11,7 @@ People.allow({
     update: function (userId, docs, fields, modifier) {
         // is a new message or complaint?
         if (_.all(fields, function(field) {
-                return (field == "complaints" || field == "messages");
+                return (field == "complaints" || field == "messages" || "status" || "picture");
             })) {
             return true;
         }

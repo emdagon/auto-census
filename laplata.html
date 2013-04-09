@@ -1,5 +1,9 @@
 <head>
-    <title>laplata</title>
+    <title>Inundación de La Plata - Listado colaborativo de víctimas</title>
+    <meta property="og:title" content="Inundación de La Plata - Listado colaborativo de víctimas<" />
+    <meta property="og:url" content="http://victimas-laplata.com/" />
+
+    <meta property="og:description" content="Esta aplicación fue creada como respuesta inmediata a la incertidumbre respecto de las personas afectadas por la inundación de la ciudad de La Plata. Su único propósito es servir a las personas para encontrar a sus seres queridos, intentando que la información fidedigna prevalezca sobre los dichos y datos incorrectos." />
 </head>
 
 <body>
@@ -7,7 +11,7 @@
 
         {{> header}}
 
-        {{> publish}}
+        {{> person}}
         {{> info}}
 
         {{> list}}
@@ -20,21 +24,21 @@
     <h1 class="text-center">Inundaci&oacute;n de La Plata</h1>
     <h2 class="text-center">Listado colaborativo de afectados</h2>
 
-    <div class="alert alert-block">
+    <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <strong>Nota del autor:</strong>
 
-        <p>Esta aplicaci&oacute;n fue creada como respuesta inmediata a la insertidumbre respecto de las personas afectadas por la inundaci&oacute;n de la ciudad de La Plata. Su &uacute;nico prop&oacute;sito es servir a las personas para encontrar a sus seres queridos, intentando que la informaci&oacute;n fidedigna prevalezca sobre los dichos y datos incorrectos.</p>
+        <p>Esta aplicaci&oacute;n fue creada como respuesta inmediata a la incertidumbre respecto de las personas afectadas por la inundaci&oacute;n de la ciudad de La Plata. Su &uacute;nico prop&oacute;sito es servir a las personas para encontrar a sus seres queridos, intentando que la informaci&oacute;n fidedigna prevalezca sobre los dichos y datos incorrectos.</p>
         <p>Por favor, utilicelo con responsabilidad.</p>
         <p>Este sitio es totalmente independiente, desarrollado y financiado por m&iacute; sin m&aacute;s intenci&oacute;n que ayudar. No me hago responsable por la veracidad de informaci&oacute;n aqu&iacute; dispuesta, ni por como pueda afectar a la sensibilidad de las personas.</p>
         <p>Sepa disculpar los errores con los que se encuentre, el desarrollo se hizo en unas pocas horas, no dude en contactarme por cualquier inquietud.</p>
-        <p>Mi coraz&oacute;n esta con las personas que estan atravezando por tanto dolor.</p>
+        <p>Mi coraz&oacute;n esta con las personas que estan atravesando por tanto dolor.</p>
         <p>Fuerza La Plata!</p>
         <p>Emilio | <i class="icon-pencil"></i> emdagon{at}gmail.com</p>
     </div>
 
     {{#if currentUser}}
-        <p>Hola <strong>{{currentUser.profile.name}}</strong>, por favor, antes de publicar no olvide buscar el nombre de la persona sobre la que desea o tiene informaci&oacute;n. <a href="#" class="btn btn-mini" id="logout">Salir</a></p>
+        <p><strong>Hola {{currentUser.profile.name}}, por favor, antes de publicar no olvide buscar el nombre de la persona sobre la que desea o tiene informaci&oacute;n.</strong> <a href="#" class="btn btn-mini" id="logout">Salir</a></p>
     {{else}}
         <div class="alert alert-error">
             <p><strong>A modo de respaldo, si desea publicar informaci&oacute;n es necesario que se identifique utilizando su cuenta de Facebook</strong></p>
@@ -42,12 +46,16 @@
     {{/if}}
 </template>
 
-<template name="publish">
+<template name="person">
 
-    <div id="publish-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="Ingresar persona" aria-hidden="true">
+    <div id="person-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4>Ingrese el nombre y una descripci&oacute;n de la persona</h4>
+            {{#if editing}}
+                <h4>Editar datos</h4>
+            {{else}}
+                <h4>Ingrese el nombre y una descripci&oacute;n de la persona</h4>
+            {{/if}}
         </div>
         <div class="modal-body">
             <form class="form-horizontal">
@@ -55,7 +63,11 @@
                 <div class="control-group">
                     <label class="control-label" for="name">Nombre</label>
                     <div class="controls">
-                        <input type="text" name="name" id="name" placeholder="Nombre completo de la persona" />
+                        {{#if editing}}
+                            <input type="text" name="name" id="name" placeholder="Nombre completo de la persona" value="{{person.name}}" {{#unless isOwner}}disabled="disabled"{{/unless}} />
+                        {{else}}
+                            <input type="text" name="name" id="name" placeholder="Nombre completo de la persona" />
+                        {{/if}}
                         <span class="help-block">Ejemplo: <em>Emilio Daniel Gonz&aacute;lez</em></span>
                     </div>
                 </div>
@@ -63,23 +75,43 @@
                 <div class="control-group">
                     <label class="control-label" for="name">Edad y Sexo</label>
                     <div class="controls">
-                        <input type="text" class="input-mini" name="age" id="age" />
+                        {{#if editing}}
+                            <input type="text" class="input-mini" name="age" id="age" value="{{person.age}}" {{#unless isOwner}}disabled{{/unless}} />
+                        {{else}}
+                            <input type="text" class="input-mini" name="age" id="age" />
+                        {{/if}}
                         <span class="help-block">Ejemplo: <em>30</em></span>
-                        <label class="radio">
-                            <input type="radio" name="genre" id="male" value="male" checked>
-                            Hombre
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="genre" id="female" value="female">
-                            Mujer
-                        </label>
+
+                        {{#if editing}}
+                            <label class="radio">
+                                <input type="radio" name="genre" id="male" value="male" {{#if is person.genre "male"}}checked{{/if}} {{#unless isOwner}}disabled{{/unless}} />
+                                Hombre
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="genre" id="female" value="female" {{#if is person.genre "female"}}checked{{/if}} {{#unless isOwner}}disabled{{/unless}} />
+                                Mujer
+                            </label>
+                        {{else}}
+                            <label class="radio">
+                                <input type="radio" name="genre" id="male" value="male" />
+                                Hombre
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="genre" id="female" value="female" />
+                                Mujer
+                            </label>
+                        {{/if}}
                     </div>
                 </div>
 
                 <div class="control-group">
                     <label class="control-label" for="description">Descripci&oacute;n</label>
                     <div class="controls">
-                        <input type="text" name="description" id="description" placeholder="Edad, descripci&oacute;n fisica, etc.">
+                        {{#if editing}}
+                            <input type="text" name="description" id="description" placeholder="Edad, descripci&oacute;n fisica, etc." value="{{person.descrition}}" {{#unless isOwner}}disabled{{/unless}} />
+                        {{else}}
+                            <input type="text" name="description" id="description" placeholder="Edad, descripci&oacute;n fisica, etc." />
+                        {{/if}}
                         <span class="help-block">Ejemplo: <em>1.80, rubio, con barba. Usaba remera negra y jeans</em>.</span>
                     </div>
                 </div>
@@ -87,8 +119,12 @@
                 <div class="control-group">
                     <label class="control-label" for="filepicker">Foto</label>
                     <div class="controls">
-                        <input type="hidden" name="picture" id="picture" value="" />
-                        <img src="/images/missing.jpg" id="picture-preview" class="img-polaroid" style="width: 120px;" /><br />
+                        <input type="hidden" name="picture" id="picture" value="{{#if editing}}{{person.picture}}{{/if}}" />
+                        {{#if editing}}
+                            <img src="{{#if person.picture}}{{person.picture}}{{else}}/images/missing.jpg{{/if}}" id="picture-preview" class="img-polaroid" style="width: 120px;" /><br />
+                        {{else}}
+                            <img src="/images/missing.jpg" id="picture-preview" class="img-polaroid" style="width: 120px;" /><br />
+                        {{/if}}
                         <a href="#" class="btn btn-small" id="filepicker">Adjuntar</a>
                     </div>
                 </div>
@@ -98,12 +134,21 @@
                 <div class="control-group">
                     <label class="control-label" for="relationship">Relaci&oacute;n</label>
                     <div class="controls">
-                        <select name="relationship" id="relationship">
-                            <option>Familiar</option>
-                            <option>Vecino(a)</option>
-                            <option>Amigo(a)/Conocido(a)</option>
-                            <option>Desconocido(a)</option>
-                        </select>
+                        {{#if editing}}
+                            <select name="relationship" id="relationship" {{#unless isOwner}}disabled{{/unless}}>
+                                <option {{#if is person.relationship "Familiar"}}selected{{/if}}>Familiar</option>
+                                <option {{#if is person.relationship "Vecino(a)"}}selected{{/if}}>Vecino(a)</option>
+                                <option {{#if is person.relationship "Amigo(a)/Conocido(a)"}}selected{{/if}}>Amigo(a)/Conocido(a)</option>
+                                <option {{#if is person.relationship "Desconocido(a)"}}selected{{/if}}>Desconocido(a)</option>
+                            </select>
+                        {{else}}
+                            <select name="relationship" id="relationship">
+                                <option>Familiar</option>
+                                <option>Vecino(a)</option>
+                                <option>Amigo(a)/Conocido(a)</option>
+                                <option>Desconocido(a)</option>
+                            </select>
+                        {{/if}}
                     </div>
                 </div>
 
@@ -111,30 +156,35 @@
                     <label class="control-label" for="status">Estado</label>
                     <div class="controls">
                         <select name="status" id="status">
-                            <option>Desaparecido(a)</option>
-                            <option>Fallecido(a)</option>
+                            <option {{#if is person.status "Desaparecido(a)"}}selected{{/if}}>Desaparecido(a)</option>
+                            <option {{#if is person.status "Fallecido(a)"}}selected{{/if}}>Fallecido(a)</option>
                         </select>
                     </div>
                 </div>
             </form>
         </div>
         <div class="modal-footer">
-            <a href="#" data-dismiss="modal" class="btn">Cancelar</a>
-            <a href="#" class="btn btn-primary" id="save">Publicar</a>
+            <button data-dismiss="modal" class="btn">Cancelar</button>
+            <button class="btn btn-primary" id="save">Guardar</button>
         </div>
     </div>
 </template>
 
 <template name="list">
     <div class="row">
-        <div class="span4">
+        {{#with people}}
+        <div class="pull-right text-info"><h4>{{count}} V&iacute;ctimas reportadas</h4></div>
+        {{/with}}
+    </div>
+    <div class="row">
+        <div class="span2">
             {{#if currentUser}}
-                <a href="#publish-modal" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Ingresar Persona</a>
+                <a href="/add" role="button" class="btn btn-primary" data-toggle="modal"><i class="icon-plus"></i> Ingresar Persona</a>
             {{else}}
                 {{loginButtons}}
             {{/if}}
         </div>
-        <div class="span3 offset5">
+        <div class="span3 offset7">
             <div class="input-append pull-right">
                 <input class="span2" id="search-input" type="text" placeholder="Nombre" />
                 <button class="btn" id="search-button" type="button">Buscar</button>
@@ -145,21 +195,25 @@
         {{#each people}}
         <li class="span3">
             <div class="thumbnail">
-                <span class="badge badge-info pull-right">{{messages}}</span>
+                <a href="/view-information/{{_id}}"><span class="badge badge-info pull-right">{{messages}}</span></a>
+                <div style="height: 200px; width: 230px;">
                 {{#if picture}}
-                    <img src="{{picture}}" class="polaroid" style="height: 200px;" />
+                    <img src="{{picture}}" class="polaroid" style="max-height: 200px; max-width: 230px;" />
                 {{else}}
-                    <img src="/images/missing.jpg" class="polaroid" style="height: 200px;" />
+                    <img src="/images/missing.jpg" class="polaroid" style="max-height: 200px; max-width: 230px;" />
                 {{/if}}
+                </div>
                 <div class="caption">
-                    <h3>{{name}}</h3>
+                    <h4>{{name}}</h4>
+                    <span>{{age}} a&ntilde;os</span>
                     <p>{{description}}</p>
-                    <p>Se presume {{status}}</p>
+                    <p>Reportado <em>{{status}}</em></p>
                 </div>
                 {{#if currentUser}}
                     <p>
-                        <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
+                        <a href="/view-information/{{_id}}" class="btn btn-warning btn-small view-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
                         <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
+                        <a href="/edit/{{_id}}" class="btn btn-success btn-small edit"><i class="icon-edit"></i> Edit</a>
                     </p>
                 {{/if}}
             </div>
@@ -193,7 +247,7 @@
                 <td>{{description}}</td>
                 <td>{{status}}</td>
                 <td>
-                    <a href="/add-information/{{_id}}" class="btn btn-warning btn-small add-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
+                    <a href="/view-information/{{_id}}" class="btn btn-warning btn-small view-information"><i class="icon-plus-sign"></i> Aportar informaci&oacute;n</a>
                     <a href="/add-complaint/{{_id}}" class="btn btn-danger btn-small" title="Reportar como informaci&oacute;n falsa o err&oacute;nea"><i class="icon-bullhorn"></i> {{complaints}}</a>
                     <span class="badge badge-info">({{messages}} Mensajes)</span>
                 </td>
@@ -223,8 +277,8 @@
                 <div class="offset1">
                     <address>
                         <strong>{{person.name}}</strong><br />
-                        {{person.description}}.<br />
-                        Se presume <em>{{person.status}}</em>.
+                        {{person.description}}<br />
+                        Reportado <em>{{person.status}}</em>
                     </address>
                 </div>
             </div>
